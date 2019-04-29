@@ -1,13 +1,16 @@
 
 class Timer {
-    constructor(){
-        this.ctx = document.getElementById('timer').getContext('2d');
+    constructor() {
+        this.canvas = document.getElementById('timer');
+        this.ctx = this.canvas.getContext('2d');
     }
-    start(){
+
+    start() {
 
     }
-    reset(){
-        
+
+    reset() {
+
     }
 }
 

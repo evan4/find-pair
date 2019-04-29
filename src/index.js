@@ -8,12 +8,10 @@ import Timer from './Timer';
 Rectangles.init();
 
 
-let btn = document.getElementById('btn-timer');
+const btn = document.getElementById('btn-timer');
 
 // начало игры
 btn.addEventListener('click', () => {
     Rectangles.start();
     Timer.start();
-
 }, false);
-
