@@ -1,4 +1,5 @@
 import Timer from './Timer';
+import randomizeArray from './helpers/randomizeArray';
 
 class Rectangles {
     constructor() {
@@ -11,12 +12,16 @@ class Rectangles {
         this.sideSquare = 100;
         // массив возможных цветов
         this.colors = ['red', 'blue', 'orange', 'forestGreen', 'gray', 'purple', 'sienna', 'moccasin'];
+        this.defaultColor = 'white';
         // массив квадратов
         this.squares = [];
         // начальная инициализация массива цветов квадратов и его заполнение дефолтным знацением
-        this.colorsRectangles = new Array(16).fill('white');
+        this.colorsRectangles = [];
+
+        this.defaultFill();
 
         this.pair = '';
+        
     }
 
     // отрисовка всех квадратов
@@ -27,7 +32,7 @@ class Rectangles {
                 this.squares.push({
                     x: x * this.sideSquare,
                     y: top,
-                    color: 'white',
+                    color: this.defaultColor,
                 });
             }
         }
@@ -35,6 +40,7 @@ class Rectangles {
     }
 
     drawRectangles() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let index = 0, len = this.squares.length; index < len; index += 1) {
             this.ctx.lineWidth = 1;
             this.ctx.fillStyle = this.squares[index].color;
@@ -49,7 +55,7 @@ class Rectangles {
     start() {
         this.fillRectangles();
         this.canvas.addEventListener('click', (e) => {
-            const endOfGame = !this.squares.some(item => item.color === 'white');
+            const endOfGame = !this.squares.some(item => item.color === this.defaultColor);
             if(endOfGame){
                 this.endOfGame();
             }
@@ -60,7 +66,7 @@ class Rectangles {
             for (let index = 0, len = this.squares.length; index < len; index += 1) {
                 if (y > this.squares[index].y && y < this.squares[index].y + this.sideSquare
                     && x > this.squares[index].x && x < this.squares[index].x + this.sideSquare) {
-                    if (this.squares[index].color === 'white') {
+                    if (this.squares[index].color === this.defaultColor) {
                         this.squares[index].color = this.colorsRectangles[index];
                         this.drawRectangles();
                         if(!this.pair){
@@ -68,9 +74,9 @@ class Rectangles {
                         }else if(this.pair === this.squares[index].color ){
                             this.pair = '';
                         }else{
-                            this.squares[index].color = 'white';
+                            this.squares[index].color = this.defaultColor;
                             const i = this.squares.findIndex(item => item.color === this.pair);
-                            this.squares[i].color = 'white';
+                            this.squares[i].color = this.defaultColor;
                             this.pair = '';
                             setTimeout(() => {
                                 this.drawRectangles();
@@ -85,10 +91,11 @@ class Rectangles {
 
     endOfGame() {
         this.canvas.removeEventListener('click', () => {
-            this.colorsRectangles.fill('white');
+            this.colorsRectangles.fill(this.defaultColor);
         });
         Timer.reset();
         alert('Вы выиграли! Затраченное время: ');
+        document.getElementById('btn-timer').disabled = false;
     }
 
     // присваивание цветов массиву квадратов
@@ -103,20 +110,12 @@ class Rectangles {
         // увеличение длины массиваа в 2 раза
         this.colorsRectangles = [...colorsUnique, ...colorsUnique];
 
-        this.colorsRectangles = this.randomizeArray([...colorsUnique, ...colorsUnique]);
+        this.colorsRectangles = randomizeArray([...colorsUnique, ...colorsUnique]);
     }
-
-    // перемешивание массива алгоритм Фишера-Йетса
-    randomizeArray(arr) {
-        let j; let
-            temp;
-        for (let i = arr.length - 1; i > 0; i -= 1) {
-            j = Math.floor(Math.random() * (i + 1));
-            temp = arr[j];
-            arr[j] = arr[i];
-            arr[i] = temp;
+    defaultFill(){
+        for (let index = 0; index < 16; index++) {
+            this.colorsRectangles.push(this.defaultColor);
         }
-        return arr;
     }
 }
 
