@@ -16,85 +16,99 @@ class Rectangles {
         // массив квадратов
         this.squares = [];
         // начальная инициализация массива цветов квадратов и его заполнение дефолтным знацением
-        this.colorsRectangles = [];
-
-        this.defaultFill();
+        this.colorsRectangles = Array.from({ length: 16 }, () => this.defaultColor);
 
         this.pair = '';
-        
+        // Активность игры
+        this.play = false;
     }
 
-    // отрисовка всех квадратов
+    // Задание значений для всех квадратов
     init() {
-        for (let y = 0; y < 4; y += 1) {
+        this.squares = [];
+        [1, 2, 3, 4].forEach((item, y) => {
             const top = y * this.sideSquare;
-            for (let x = 0; x < 4; x += 1) {
+            [1, 2, 3, 4].forEach((items, x) => {
                 this.squares.push({
                     x: x * this.sideSquare,
                     y: top,
                     color: this.defaultColor,
                 });
-            }
-        }
+            });
+        });
         this.drawRectangles();
+        return this;
     }
 
+    // отрисовка всех квадратов
     drawRectangles() {
+        // очистка холста
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        for (let index = 0, len = this.squares.length; index < len; index += 1) {
+        this.squares.forEach((item) => {
             this.ctx.lineWidth = 1;
-            this.ctx.fillStyle = this.squares[index].color;
-            this.ctx.fillRect(this.squares[index].x, this.squares[index].y,
-                this.sideSquare, this.sideSquare);
+            this.ctx.fillStyle = item.color;
+            this.ctx.fillRect(item.x, item.y, this.sideSquare, this.sideSquare);
             this.ctx.strokeStyle = 'rgb(108,117,125)';
-            this.ctx.strokeRect(this.squares[index].x, this.squares[index].y,
-                this.sideSquare, this.sideSquare);
-        }
+            this.ctx.strokeRect(item.x, item.y, this.sideSquare, this.sideSquare);
+        });
+        return this;
     }
 
     start() {
+        this.play = true;
         this.fillRectangles();
-        this.canvas.addEventListener('click', (e) => {
-            const endOfGame = !this.squares.some(item => item.color === this.defaultColor);
-            if(endOfGame){
-                this.endOfGame();
-            }
-            // вычисление позиции курсора
-            const x = e.pageX - this.canvas.offsetLeft;
-            const y = e.pageY - this.canvas.offsetTop;
+        this.canvas.addEventListener('click', e => this.game(e), false);
+        return this;
+    }
 
-            for (let index = 0, len = this.squares.length; index < len; index += 1) {
-                if (y > this.squares[index].y && y < this.squares[index].y + this.sideSquare
-                    && x > this.squares[index].x && x < this.squares[index].x + this.sideSquare) {
-                    if (this.squares[index].color === this.defaultColor) {
-                        this.squares[index].color = this.colorsRectangles[index];
-                        this.drawRectangles();
-                        if(!this.pair){
-                           this.pair = this.squares[index].color 
-                        }else if(this.pair === this.squares[index].color ){
-                            this.pair = '';
-                        }else{
-                            this.squares[index].color = this.defaultColor;
-                            const i = this.squares.findIndex(item => item.color === this.pair);
-                            this.squares[i].color = this.defaultColor;
-                            this.pair = '';
-                            setTimeout(() => {
-                                this.drawRectangles();
-                            }, 500);
-                        }
+    game(e) {
+        if (!this.play) return;
+
+        // вычисление позиции курсора
+        const x = e.pageX - this.canvas.offsetLeft;
+        const y = e.pageY - this.canvas.offsetTop;
+        this.squares.some((item, index) => {
+            if (y > item.y && y < item.y + this.sideSquare
+                && x > item.x && x < item.x + this.sideSquare) {
+                if (item.color === this.defaultColor) {
+                    this.squares[index].color = this.colorsRectangles[index];
+                    this.drawRectangles();
+                    if (!this.pair) {
+                        this.pair = item.color;
+                    } else if (this.pair === item.color) {
+                        this.pair = '';
+                    } else {
+                        this.squares[index].color = this.defaultColor;
+                        const i = this.squares.findIndex(items => items.color === this.pair);
+                        this.squares[i].color = this.defaultColor;
+                        this.pair = '';
+                        setTimeout(() => {
+                            this.drawRectangles();
+                        }, 500);
                     }
-                    break;
+                } else {
+                    return true;
                 }
             }
+            return false;
         });
+        const endOfGame = this.squares.some(item => item.color === this.defaultColor);
+        if (!endOfGame) {
+            setTimeout(() => {
+                this.endOfGame();
+            }, 500);
+        }
     }
 
     endOfGame() {
-        this.canvas.removeEventListener('click', () => {
-            this.colorsRectangles.fill(this.defaultColor);
-        });
+        if (this.play) this.play = false;
+        if (Timer.getTime() === '0:0.0') return;
+        alert(`Вы выиграли! Затраченное время: ${Timer.getTime()}`);
+        this.canvas.removeEventListener('click', e => this.game(e), false);
+        this.colorsRectangles.fill(this.defaultColor);
+        this.pair = '';
+        this.init();
         Timer.reset();
-        alert('Вы выиграли! Затраченное время: ');
         document.getElementById('btn-timer').disabled = false;
     }
 
@@ -108,14 +122,8 @@ class Rectangles {
             colorsUnique.add(color);
         }
         // увеличение длины массиваа в 2 раза
-        this.colorsRectangles = [...colorsUnique, ...colorsUnique];
-
         this.colorsRectangles = randomizeArray([...colorsUnique, ...colorsUnique]);
-    }
-    defaultFill(){
-        for (let index = 0; index < 16; index++) {
-            this.colorsRectangles.push(this.defaultColor);
-        }
+        return this;
     }
 }
 

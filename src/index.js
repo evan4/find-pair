@@ -1,5 +1,4 @@
 import './css/bootstrap.min.css';
-import './css/style.css';
 
 import Rectangles from './Rectangles';
 import Timer from './Timer';
