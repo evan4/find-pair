@@ -22,6 +22,7 @@ class Timer {
 
     // По стандарту минимальная задержка – 4 мс
     this.milliseconds += 5;
+
     // Вычислить секунды
     if ( this.milliseconds > 999 ) {
 
@@ -29,6 +30,7 @@ class Timer {
       this.seconds += 1;
 
     }
+
     // Вычислить минуты
     if ( this.seconds > 59 ) {
 
@@ -37,10 +39,12 @@ class Timer {
       this.minutes += 1;
 
     }
+
     // очистка холста
     this.ctx.clearRect(
       0, 0, this.canvas.width, this.canvas.height,
     );
+
     // отрисовка времени
     this.ctx.font = '20px Arial';
     this.ctx.fillStyle = 'black';
@@ -58,6 +62,7 @@ class Timer {
 
   }
 
+  // сброс таймера
   reset() {
 
     clearInterval( this.time );
